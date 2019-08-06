@@ -1,0 +1,153 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "support.h"
+#define WIDTH 50
+#define HEIGHT 25
+
+enum object{Snake = '*', Fruit = 'F', Empty = ' '};
+typedef enum object obj;
+struct positions {
+  int x;
+  int y;
+};
+typedef struct positions position;
+struct sanke{
+  position head;
+  position * tail;
+};
+typedef struct snake p_snake;
+struct sanke s;
+obj field[WIDTH][HEIGHT];
+
+void resetField();
+void resetSnake();
+void printField();
+void move(char d);
+void PutSnakeOnField();
+void start();
+
+int main(){
+  support_init();
+  resetField();
+  resetSnake();
+  start();
+  return 0;
+}
+
+void resetField(){
+  for (int i=0; i<HEIGHT;i++){
+    for (int j=0; j<WIDTH;j++){
+      field[i][j] = Empty;
+    }
+  }
+}
+
+void resetSnake(){
+  s.head.x = (int) WIDTH/2;
+  s.head.y = (int) HEIGHT/2;
+  p_snake p = &s;
+  int i = 1;
+  while (i < 3){
+    position tmp = p->head;
+    tmp.x++;
+    p->tail=malloc(sizeof(struct tail_t));
+    p->tail->head=tmp;
+    i++;
+  }
+  PutSnakeOnField();
+}
+
+void printField(){
+  for (int i=-1; i<=HEIGHT;i++){
+    for (int j=-1; j<=WIDTH;j++){
+      if (i==-1 || i==HEIGHT){
+	printf("-");
+      }
+      else{
+	if (j==-1 || j==WIDTH){
+	  printf("|");
+	}
+	else{
+	  printf("%c",field[i][j]);
+	}
+      }
+    }
+    printf("\n");
+  }
+}
+
+void PutSnakeOnField(){
+  p_snake * p = &s;
+  while (p != NULL){
+    field[p->head.y][p->head.x] = Tail;
+    p = p->tail;
+  }
+}
+
+void move(char d){
+  position p = s.head;
+  switch(d){
+  case 'd':{
+    if (p.x==HEIGHT) p.x=0;
+    else p.x++;
+    break;
+  }
+  case 'a':{
+    if (p.x==0) p.x=HEIGHT;
+    else p.x--;
+    break;
+  }
+  case 'w':{
+    if (p.y==WIDTH) p.y=0;
+    else p.y++;
+    
+    break;
+  }
+  case 's':{
+    if (p.y==0) p.y=WIDTH;
+    else p.y--;
+    break;
+  }
+  }
+  if (field[p.x][p.y]==Tail){
+      resetField();
+      printf("\nGAME OVER");
+      exit(0);
+  }
+  if (field[p.x][p.y]==Fruit){
+    //TODO Fruit imp
+    printf("\nFUCKFRUIT");
+  }
+  else{
+    //s.body.pos=s.head;
+    //tail * p1 = s.body.next;
+    /*while (p1!=NULL){
+      if (p1->next==NULL){
+        p1 = NULL;
+      }
+      else{
+        p1->next->pos.x=p1->pos.x;
+        p1->next->pos.y=p1->pos.y;
+      }
+    }*/
+    
+    s.head=p;
+  }
+  support_clear();
+  resetField();
+  PutSnakeOnField();
+  printField();
+}
+
+void start(){
+  printField();
+  char a = 'a';
+  char n;
+  while (a!='x'){
+    n = (char) support_readkey(1000);
+    if (n == 'a' || n == 'w' || n == 's' || n == 'd' || n == 'x') a = n;
+    move(a);
+  }
+  printf("Exit");
+}
